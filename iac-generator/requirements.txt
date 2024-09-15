@@ -1,0 +1,4 @@
+boto3==1.18.0
+terraform-parser==0.1.0
+click==8.0.1
+Flask==2.0.1
