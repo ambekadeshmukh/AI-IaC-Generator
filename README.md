@@ -43,7 +43,13 @@ This project uses natural language processing to generate Terraform code based o
 
 2. Open a web browser and navigate to `http://localhost:5000`.
 
+![Screenshot 2024-09-15 194306](https://github.com/user-attachments/assets/644ba9cd-ca3f-47af-80a4-a082c2c5d953)
+
+
 3. Enter a description of your desired infrastructure and click "Generate Terraform Code".
+
+![Screenshot 2024-09-15 194326](https://github.com/user-attachments/assets/5fb297f8-77a7-4db1-bf52-ae5f5f7db11b)
+
 
 ## Limitations
 
@@ -56,4 +62,4 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
