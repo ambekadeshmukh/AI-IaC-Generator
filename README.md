@@ -19,7 +19,7 @@ This project uses natural language processing to generate Terraform code based o
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/iac-generator.git
+   git clone https://github.com/ambekadeshmukh/iac-generator.git
    cd iac-generator
    ```
 
