@@ -1,0 +1,271 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Terraform Code</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/highlight.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.5.1/languages/terraform.min.js"></script>
+    <style>
+        .resource-card:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+        .copy-button {
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+        .code-container:hover .copy-button {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-blue-600 mb-2">Generated Terraform Code</h1>
+            <p class="text-lg text-gray-600">Based on your infrastructure description, we've generated the following Terraform code.</p>
+        </header>
+
+        <div class="max-w-5xl mx-auto mb-12">
+            <!-- Infrastructure Visualization -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-10">
+                <div class="px-8 py-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">Infrastructure Visualization</h2>
+                </div>
+                <div class="p-8">
+                    <!-- SVG diagram of the resources -->
+                    <div class="w-full h-64 bg-gray-50 border border-gray-200 rounded-lg flex items-center justify-center">
+                        <svg width="100%" height="100%" viewBox="0 0 800 250" xmlns="http://www.w3.org/2000/svg">
+                            <!-- This is a placeholder. In a real implementation, you would generate this dynamically -->
+                            {% if resources %}
+                                {% set spacing = 800 / (resources|length + 1) %}
+                                {% for resource in resources %}
+                                    {% set x = loop.index * spacing %}
+                                    {% set y = 125 %}
+                                    
+                                    <!-- Resource icon and label based on type -->
+                                    <g transform="translate({{ x - 40 }}, {{ y - 40 }})">
+                                        <rect x="0" y="0" width="80" height="80" rx="10" fill="#EBF5FF" stroke="#4299E1" stroke-width="2" />
+                                        
+                                        <!-- Icon based on resource type -->
+                                        {% if 'instance' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">🖥️</text>
+                                        {% elif 'vpc' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">🌐</text>
+                                        {% elif 'subnet' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">🔗</text>
+                                        {% elif 'volume' in resource.type or 'disk' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">💾</text>
+                                        {% elif 'bucket' in resource.type or 'storage' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">📦</text>
+                                        {% elif 'database' in resource.type or 'db' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">🗄️</text>
+                                        {% elif 'function' in resource.type or 'lambda' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">λ</text>
+                                        {% elif 'security' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">🔒</text>
+                                        {% else %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">📄</text>
+                                        {% endif %}
+                                        
+                                        <text x="40" y="65" text-anchor="middle" font-size="12">{{ resource.name }}</text>
+                                    </g>
+                                    
+                                    <!-- Connections (simplified) -->
+                                    {% if not loop.first %}
+                                        <line x1="{{ (loop.index - 1) * spacing + 40 }}" y1="{{ y }}" x2="{{ x - 40 }}" y2="{{ y }}" stroke="#4299E1" stroke-width="2" stroke-dasharray="5,5" />
+                                    {% endif %}
+                                {% endfor %}
+                            {% else %}
+                                <text x="400" y="125" text-anchor="middle" font-size="16" fill="#718096">No resources to display</text>
+                            {% endif %}
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Overview -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-10">
+                <div class="px-8 py-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">Resources Overview</h2>
+                </div>
+                <div class="p-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        {% if resources %}
+                            {% for resource in resources %}
+                                <div class="resource-card bg-blue-50 rounded-lg border border-blue-200 p-4 transition-all duration-300">
+                                    <div class="flex items-center mb-3">
+                                        <!-- Icon based on resource type -->
+                                        <div class="mr-3 text-blue-500 text-xl">
+                                            {% if 'instance' in resource.type %}
+                                                <i class="fas fa-server"></i>
+                                            {% elif 'vpc' in resource.type %}
+                                                <i class="fas fa-network-wired"></i>
+                                            {% elif 'subnet' in resource.type %}
+                                                <i class="fas fa-project-diagram"></i>
+                                            {% elif 'volume' in resource.type or 'disk' in resource.type %}
+                                                <i class="fas fa-hdd"></i>
+                                            {% elif 'bucket' in resource.type or 'storage' in resource.type %}
+                                                <i class="fas fa-archive"></i>
+                                            {% elif 'database' in resource.type or 'db' in resource.type %}
+                                                <i class="fas fa-database"></i>
+                                            {% elif 'function' in resource.type or 'lambda' in resource.type %}
+                                                <i class="fas fa-code"></i>
+                                            {% elif 'security' in resource.type %}
+                                                <i class="fas fa-shield-alt"></i>
+                                            {% else %}
+                                                <i class="fas fa-file-code"></i>
+                                            {% endif %}
+                                        </div>
+                                        <h3 class="font-bold text-gray-800">{{ resource.type }}</h3>
+                                    </div>
+                                    <p class="text-sm text-gray-600 mb-2">Name: <span class="font-medium">{{ resource.name }}</span></p>
+                                    
+                                    <!-- Show key parameters -->
+                                    <div class="mt-2 text-xs text-gray-500">
+                                        <p class="mb-1">Key parameters:</p>
+                                        <ul class="pl-3">
+                                            {% for key, value in resource.parameters.items() %}
+                                                {% if loop.index <= 3 %}  <!-- Limit to first 3 parameters -->
+                                                    <li>{{ key }}: 
+                                                        {% if value is mapping %}
+                                                            (object)
+                                                        {% elif value is iterable and value is not string %}
+                                                            (list)
+                                                        {% else %}
+                                                            {{ value }}
+                                                        {% endif %}
+                                                    </li>
+                                                {% endif %}
+                                            {% endfor %}
+                                            {% if resource.parameters|length > 3 %}
+                                                <li>+ {{ resource.parameters|length - 3 }} more</li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="col-span-3 text-center py-8 text-gray-500">
+                                <p>No resources were identified in your description.</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Generated Terraform Code -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Terraform Code</h2>
+                    <button id="download-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
+                        <i class="fas fa-download mr-2"></i>Download
+                    </button>
+                </div>
+                <div class="p-8 code-container relative">
+                    <button class="copy-button absolute top-10 right-10 bg-gray-800 hover:bg-gray-700 text-white font-medium py-1 px-3 rounded text-sm transition-all duration-200" onclick="copyToClipboard()">
+                        <i class="fas fa-copy mr-1"></i>Copy
+                    </button>
+                    <pre><code class="language-terraform">{{ tf_code }}</code></pre>
+                </div>
+            </div>
+
+            <!-- Cost Estimate (if requested) -->
+            {% if estimated_cost is not none %}
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="px-8 py-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">Estimated Monthly Cost</h2>
+                </div>
+                <div class="p-8">
+                    <div class="text-center">
+                        <p class="text-4xl font-bold text-blue-600">${{ "%.2f"|format(estimated_cost) }}</p>
+                        <p class="text-gray-500 mt-2">Approximate monthly cost based on current pricing</p>
+                    </div>
+                    <div class="mt-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 text-sm">
+                        <p class="text-yellow-700"><i class="fas fa-info-circle mr-2"></i>This is only an estimate. Actual costs may vary based on usage, region, and specific configurations.</p>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Next Steps -->
+            <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
+                <div class="px-8 py-6 border-b border-gray-200">
+                    <h2 class="text-2xl font-bold text-gray-800">Next Steps</h2>
+                </div>
+                <div class="p-8">
+                    <ol class="list-decimal pl-6 space-y-3">
+                        <li class="text-gray-700">
+                            <span class="font-medium">Save the generated code</span> to a file named <code class="bg-gray-100 px-2 py-1 rounded text-sm">main.tf</code>
+                        </li>
+                        <li class="text-gray-700">
+                            <span class="font-medium">Review and modify</span> the code to suit your specific requirements
+                        </li>
+                        <li class="text-gray-700">
+                            <span class="font-medium">Initialize Terraform</span> by running <code class="bg-gray-100 px-2 py-1 rounded text-sm">terraform init</code>
+                        </li>
+                        <li class="text-gray-700">
+                            <span class="font-medium">Validate the configuration</span> with <code class="bg-gray-100 px-2 py-1 rounded text-sm">terraform validate</code>
+                        </li>
+                        <li class="text-gray-700">
+                            <span class="font-medium">Plan the deployment</span> using <code class="bg-gray-100 px-2 py-1 rounded text-sm">terraform plan</code>
+                        </li>
+                        <li class="text-gray-700">
+                            <span class="font-medium">Apply the infrastructure</span> with <code class="bg-gray-100 px-2 py-1 rounded text-sm">terraform apply</code>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="text-center mt-8">
+                <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-200">
+                    Generate Another Infrastructure
+                </a>
+            </div>
+        </div>
+
+        <footer class="text-center text-gray-500 mt-12">
+            <p>&copy; 2025 IaC Generator | <a href="https://github.com/ambekadeshmukh/iac-generator" class="text-blue-500 hover:underline">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Highlight code syntax
+            hljs.highlightAll();
+            
+            // Download button
+            document.getElementById('download-btn').addEventListener('click', function() {
+                const code = `{{ tf_code }}`;
+                const blob = new Blob([code], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'main.tf';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            });
+            
+            // Copy code function
+            window.copyToClipboard = function() {
+                const code = `{{ tf_code }}`;
+                navigator.clipboard.writeText(code).then(function() {
+                    const copyBtn = document.querySelector('.copy-button');
+                    const originalText = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Copied!';
+                    setTimeout(function() {
+                        copyBtn.innerHTML = originalText;
+                    }, 2000);
+                });
+            }
+        });
+    </script>
+</body>
+</html>

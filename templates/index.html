@@ -1,0 +1,201 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI-Powered IaC Generator</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        .loading {
+            display: none;
+        }
+        .loading.active {
+            display: flex;
+        }
+        .cloud-option:hover {
+            transform: translateY(-5px);
+            transition: transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-12 text-center">
+            <h1 class="text-4xl font-bold text-blue-600 mb-2">AI-Powered Infrastructure as Code Generator</h1>
+            <p class="text-lg text-gray-600">Describe your infrastructure needs in plain English, and we'll generate the Terraform code.</p>
+        </header>
+
+        <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-lg overflow-hidden">
+            <div class="p-8">
+                <form id="iac-form" action="/generate-html" method="post" class="space-y-6">
+                    <!-- Cloud Provider Selection -->
+                    <div class="mb-6">
+                        <label class="block text-gray-700 text-sm font-bold mb-4" for="cloud_provider">
+                            Choose Cloud Provider:
+                        </label>
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                            <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center" data-provider="aws">
+                                <div class="flex justify-center mb-2">
+                                    <i class="fas fa-cloud text-blue-500 text-3xl"></i>
+                                </div>
+                                <div class="font-medium">AWS</div>
+                                <input type="radio" name="cloud_provider" value="aws" class="hidden cloud-radio" checked>
+                            </div>
+                            <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center" data-provider="azure">
+                                <div class="flex justify-center mb-2">
+                                    <i class="fas fa-cloud text-blue-700 text-3xl"></i>
+                                </div>
+                                <div class="font-medium">Azure</div>
+                                <input type="radio" name="cloud_provider" value="azure" class="hidden cloud-radio">
+                            </div>
+                            <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center" data-provider="gcp">
+                                <div class="flex justify-center mb-2">
+                                    <i class="fas fa-cloud text-green-500 text-3xl"></i>
+                                </div>
+                                <div class="font-medium">Google Cloud</div>
+                                <input type="radio" name="cloud_provider" value="gcp" class="hidden cloud-radio">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Infrastructure Description -->
+                    <div>
+                        <label class="block text-gray-700 text-sm font-bold mb-2" for="description">
+                            Describe your desired infrastructure:
+                        </label>
+                        <textarea 
+                            class="shadow-sm appearance-none border rounded-lg w-full py-3 px-4 text-gray-700 leading-tight focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent" 
+                            id="description" 
+                            name="description" 
+                            rows="5" 
+                            placeholder="E.g., Create a high-availability setup with two EC2 instances behind a load balancer, an RDS MySQL database, and an S3 bucket for static assets. Use t2.micro instances in us-west-2 region." 
+                            required
+                        ></textarea>
+                        <p class="mt-2 text-sm text-gray-500">Be as specific as possible. Include instance types, regions, sizes, etc.</p>
+                    </div>
+
+                    <!-- Options -->
+                    <div class="flex items-center">
+                        <input type="checkbox" id="include_cost_estimate" name="include_cost_estimate" class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="include_cost_estimate" class="ml-2 block text-sm text-gray-700">
+                            Include approximate cost estimate
+                        </label>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="flex items-center justify-between">
+                        <button 
+                            class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200" 
+                            type="submit"
+                        >
+                            Generate Terraform Code
+                        </button>
+                        
+                        <div class="loading items-center">
+                            <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-blue-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Generating Infrastructure...</span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Examples Section -->
+            <div class="bg-gray-50 px-8 py-6 border-t">
+                <h3 class="text-lg font-medium text-gray-700 mb-4">Example Descriptions:</h3>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-white p-4 rounded border hover:shadow-md cursor-pointer example-card">
+                        <h4 class="font-medium text-blue-600 mb-1">Simple Web Server</h4>
+                        <p class="text-sm text-gray-600">Create an EC2 t2.micro instance with a security group allowing HTTP and SSH access, and a 20GB EBS volume.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border hover:shadow-md cursor-pointer example-card">
+                        <h4 class="font-medium text-blue-600 mb-1">Microservices Infrastructure</h4>
+                        <p class="text-sm text-gray-600">Set up an EKS cluster with 3 t3.medium worker nodes, an RDS Postgres database, and an ElastiCache Redis instance.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border hover:shadow-md cursor-pointer example-card">
+                        <h4 class="font-medium text-blue-600 mb-1">Static Website Hosting</h4>
+                        <p class="text-sm text-gray-600">Create an S3 bucket configured for static website hosting with CloudFront distribution for caching.</p>
+                    </div>
+                    <div class="bg-white p-4 rounded border hover:shadow-md cursor-pointer example-card">
+                        <h4 class="font-medium text-blue-600 mb-1">Secure Network Architecture</h4>
+                        <p class="text-sm text-gray-600">Create a VPC with public and private subnets across two availability zones, with NAT gateways for outbound connectivity.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Features Section -->
+        <div class="max-w-5xl mx-auto mt-16 mb-12">
+            <h2 class="text-2xl font-bold text-center text-gray-800 mb-8">Features</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-blue-500 text-3xl mb-4">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">AI-Powered</h3>
+                    <p class="text-gray-600">Uses advanced natural language processing to understand your infrastructure requirements.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-blue-500 text-3xl mb-4">
+                        <i class="fas fa-cloud"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Multi-Cloud</h3>
+                    <p class="text-gray-600">Generate infrastructure code for AWS, Azure, and Google Cloud from the same description.</p>
+                </div>
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <div class="text-blue-500 text-3xl mb-4">
+                        <i class="fas fa-shield-alt"></i>
+                    </div>
+                    <h3 class="text-xl font-semibold mb-2">Best Practices</h3>
+                    <p class="text-gray-600">Follows infrastructure as code best practices with security and optimization in mind.</p>
+                </div>
+            </div>
+        </div>
+
+        <footer class="text-center text-gray-500 mt-12">
+            <p>&copy; 2025 IaC Generator | <a href="https://github.com/ambekadeshmukh/iac-generator" class="text-blue-500 hover:underline">GitHub</a></p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Cloud provider selection
+            const cloudOptions = document.querySelectorAll('.cloud-option');
+            cloudOptions.forEach(option => {
+                option.addEventListener('click', function() {
+                    // Remove active class from all options
+                    cloudOptions.forEach(opt => opt.classList.remove('bg-blue-50', 'border-blue-500'));
+                    
+                    // Add active class to selected option
+                    this.classList.add('bg-blue-50', 'border-blue-500');
+                    
+                    // Check the radio button
+                    const radio = this.querySelector('.cloud-radio');
+                    radio.checked = true;
+                });
+            });
+
+            // Example cards
+            const exampleCards = document.querySelectorAll('.example-card');
+            exampleCards.forEach(card => {
+                card.addEventListener('click', function() {
+                    const descriptionText = this.querySelector('p').textContent;
+                    document.getElementById('description').value = descriptionText;
+                });
+            });
+
+            // Loading indicator
+            const form = document.getElementById('iac-form');
+            const loading = document.querySelector('.loading');
+            
+            form.addEventListener('submit', function() {
+                loading.classList.add('active');
+            });
+        });
+    </script>
+</body>
+</html>
