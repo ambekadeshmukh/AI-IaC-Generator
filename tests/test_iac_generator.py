@@ -290,12 +290,6 @@ def test_full_integration():
 
 if __name__ == "__main__":
     pytest.main()
-_code == 200
-        data = response.json()
-        assert "terraform_code" in data
-        assert "resources" in data
-        assert "estimated_cost" in data
-        assert data["estimated_cost"] == 42.0
 
 def test_generate_html_endpoint():
     # Mock the necessary functions
