@@ -1,4 +1,4 @@
-<!-- templates/index.html -->
+<!-- templates/index.html - Updated with cloud provider logos -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -18,6 +18,18 @@
             transform: translateY(-5px);
             transition: transform 0.3s ease;
         }
+        /* Make SVG icons visible with proper color */
+        .cloud-option img {
+            filter: invert(36%) sepia(38%) saturate(7414%) hue-rotate(201deg) brightness(98%) contrast(101%);
+            transition: transform 0.3s ease;
+        }
+        .cloud-option:hover img {
+            transform: scale(1.1);
+        }
+        .cloud-option.active {
+            border-color: #4299E1;
+            background-color: #EBF8FF;
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
@@ -36,23 +48,23 @@
                             Choose Cloud Provider:
                         </label>
                         <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center" data-provider="aws">
+                            <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center active" data-provider="aws">
                                 <div class="flex justify-center mb-2">
-                                    <i class="fas fa-cloud text-blue-500 text-3xl"></i>
+                                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/amazonaws.svg" alt="AWS Logo" class="h-8 w-auto">
                                 </div>
                                 <div class="font-medium">AWS</div>
                                 <input type="radio" name="cloud_provider" value="aws" class="hidden cloud-radio" checked>
                             </div>
                             <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center" data-provider="azure">
                                 <div class="flex justify-center mb-2">
-                                    <i class="fas fa-cloud text-blue-700 text-3xl"></i>
+                                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/microsoftazure.svg" alt="Azure Logo" class="h-8 w-auto">
                                 </div>
                                 <div class="font-medium">Azure</div>
                                 <input type="radio" name="cloud_provider" value="azure" class="hidden cloud-radio">
                             </div>
                             <div class="cloud-option border rounded-lg p-4 cursor-pointer hover:bg-blue-50 transition-colors duration-200 text-center" data-provider="gcp">
                                 <div class="flex justify-center mb-2">
-                                    <i class="fas fa-cloud text-green-500 text-3xl"></i>
+                                    <img src="https://cdn.jsdelivr.net/npm/simple-icons@v4/icons/googlecloud.svg" alt="Google Cloud Logo" class="h-8 w-auto">
                                 </div>
                                 <div class="font-medium">Google Cloud</div>
                                 <input type="radio" name="cloud_provider" value="gcp" class="hidden cloud-radio">
@@ -168,10 +180,10 @@
             cloudOptions.forEach(option => {
                 option.addEventListener('click', function() {
                     // Remove active class from all options
-                    cloudOptions.forEach(opt => opt.classList.remove('bg-blue-50', 'border-blue-500'));
+                    cloudOptions.forEach(opt => opt.classList.remove('active', 'bg-blue-50', 'border-blue-500'));
                     
                     // Add active class to selected option
-                    this.classList.add('bg-blue-50', 'border-blue-500');
+                    this.classList.add('active');
                     
                     // Check the radio button
                     const radio = this.querySelector('.cloud-radio');
@@ -185,6 +197,10 @@
                 card.addEventListener('click', function() {
                     const descriptionText = this.querySelector('p').textContent;
                     document.getElementById('description').value = descriptionText;
+                    // Scroll to textarea for better UX
+                    document.getElementById('description').scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    // Focus the textarea
+                    document.getElementById('description').focus();
                 });
             });
 
@@ -193,7 +209,22 @@
             const loading = document.querySelector('.loading');
             
             form.addEventListener('submit', function() {
+                // Validate the form
+                const description = document.getElementById('description').value.trim();
+                if (!description) {
+                    alert('Please provide a description of your infrastructure.');
+                    return false;
+                }
+                
+                // Show loading indicator
                 loading.classList.add('active');
+                
+                // Disable the submit button to prevent multiple submissions
+                const submitButton = form.querySelector('button[type="submit"]');
+                submitButton.disabled = true;
+                submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+                
+                return true;
             });
         });
     </script>

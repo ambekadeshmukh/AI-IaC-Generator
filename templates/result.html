@@ -1,4 +1,4 @@
-<!-- templates/result.html -->
+<!-- templates/result.html - Updated with fixed copy/download buttons -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -22,9 +22,43 @@
         .code-container:hover .copy-button {
             opacity: 1;
         }
+        /* Improved button styles for visibility */
+        .action-button {
+            transition: all 0.3s ease;
+        }
+        .action-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        /* Improve visibility of copied notification */
+        .copied-notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: #4299E1;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 6px;
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: all 0.3s ease;
+            z-index: 50;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .copied-notification.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
     </style>
 </head>
 <body class="bg-gray-50 min-h-screen">
+    <div id="copied-notification" class="copied-notification">
+        <div class="flex items-center">
+            <i class="fas fa-check-circle mr-2"></i>
+            <span>Copied to clipboard!</span>
+        </div>
+    </div>
+
     <div class="container mx-auto px-4 py-8">
         <header class="mb-12 text-center">
             <h1 class="text-4xl font-bold text-blue-600 mb-2">Generated Terraform Code</h1>
@@ -69,6 +103,12 @@
                                             <text x="40" y="35" text-anchor="middle" font-size="24">λ</text>
                                         {% elif 'security' in resource.type %}
                                             <text x="40" y="35" text-anchor="middle" font-size="24">🔒</text>
+                                        {% elif 'lb' in resource.type or 'balancer' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">⚖️</text>
+                                        {% elif 'elasticache' in resource.type or 'redis' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">📊</text>
+                                        {% elif 'cloudfront' in resource.type %}
+                                            <text x="40" y="35" text-anchor="middle" font-size="24">🌍</text>
                                         {% else %}
                                             <text x="40" y="35" text-anchor="middle" font-size="24">📄</text>
                                         {% endif %}
@@ -118,6 +158,12 @@
                                                 <i class="fas fa-code"></i>
                                             {% elif 'security' in resource.type %}
                                                 <i class="fas fa-shield-alt"></i>
+                                            {% elif 'lb' in resource.type or 'balancer' in resource.type %}
+                                                <i class="fas fa-balance-scale"></i>
+                                            {% elif 'elasticache' in resource.type or 'redis' in resource.type %}
+                                                <i class="fas fa-memory"></i>
+                                            {% elif 'cloudfront' in resource.type %}
+                                                <i class="fas fa-globe"></i>
                                             {% else %}
                                                 <i class="fas fa-file-code"></i>
                                             {% endif %}
@@ -163,15 +209,15 @@
             <div class="bg-white rounded-lg shadow-lg overflow-hidden mb-8">
                 <div class="px-8 py-6 border-b border-gray-200 flex justify-between items-center">
                     <h2 class="text-2xl font-bold text-gray-800">Terraform Code</h2>
-                    <button id="download-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
+                    <button id="download-btn" class="action-button bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50 transition-colors duration-200">
                         <i class="fas fa-download mr-2"></i>Download
                     </button>
                 </div>
                 <div class="p-8 code-container relative">
-                    <button class="copy-button absolute top-10 right-10 bg-gray-800 hover:bg-gray-700 text-white font-medium py-1 px-3 rounded text-sm transition-all duration-200" onclick="copyToClipboard()">
+                    <button id="copy-button" class="copy-button action-button absolute top-10 right-10 bg-gray-800 hover:bg-gray-700 text-white font-medium py-1 px-3 rounded text-sm transition-all duration-200">
                         <i class="fas fa-copy mr-1"></i>Copy
                     </button>
-                    <pre><code class="language-terraform">{{ tf_code }}</code></pre>
+                    <pre id="terraform-code"><code class="language-terraform">{{ tf_code }}</code></pre>
                 </div>
             </div>
 
@@ -223,7 +269,7 @@
             </div>
 
             <div class="text-center mt-8">
-                <a href="/" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-200">
+                <a href="/" class="action-button bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-6 rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-opacity-50 transition-colors duration-200">
                     Generate Another Infrastructure
                 </a>
             </div>
@@ -239,9 +285,22 @@
             // Highlight code syntax
             hljs.highlightAll();
             
-            // Download button
+            // Copy button functionality
+            document.getElementById('copy-button').addEventListener('click', function() {
+                const code = document.querySelector('code.language-terraform').textContent;
+                navigator.clipboard.writeText(code)
+                    .then(function() {
+                        showCopiedNotification();
+                    })
+                    .catch(function(err) {
+                        console.error('Could not copy text: ', err);
+                        alert('Failed to copy. Please try again or copy manually.');
+                    });
+            });
+            
+            // Download button functionality
             document.getElementById('download-btn').addEventListener('click', function() {
-                const code = `{{ tf_code }}`;
+                const code = document.querySelector('code.language-terraform').textContent;
                 const blob = new Blob([code], { type: 'text/plain' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
@@ -253,17 +312,12 @@
                 URL.revokeObjectURL(url);
             });
             
-            // Copy code function
-            window.copyToClipboard = function() {
-                const code = `{{ tf_code }}`;
-                navigator.clipboard.writeText(code).then(function() {
-                    const copyBtn = document.querySelector('.copy-button');
-                    const originalText = copyBtn.innerHTML;
-                    copyBtn.innerHTML = '<i class="fas fa-check mr-1"></i>Copied!';
-                    setTimeout(function() {
-                        copyBtn.innerHTML = originalText;
-                    }, 2000);
-                });
+            function showCopiedNotification() {
+                const notification = document.getElementById('copied-notification');
+                notification.classList.add('active');
+                setTimeout(function() {
+                    notification.classList.remove('active');
+                }, 2000);
             }
         });
     </script>
