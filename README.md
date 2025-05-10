@@ -4,7 +4,6 @@
   ![Python](https://img.shields.io/badge/Python-3.11-blue)
   ![FastAPI](https://img.shields.io/badge/FastAPI-0.108.0-green)
   ![Terraform](https://img.shields.io/badge/Terraform-1.7.0-purple)
-  ![License](https://img.shields.io/badge/License-Apache_2.0-blue)
   
   <p>Generate Terraform code from natural language descriptions using AI-powered language understanding</p>
 </div>
@@ -147,6 +146,10 @@ Run the test suite with:
 pytest
 ```
 
+## Demo 
+
+View the demo here - https://youtu.be/kuNb2WOlWHo
+
 ## 🤝 Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
@@ -158,10 +161,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 5. Open a Pull Request
 
 Please make sure to update tests as appropriate.
-
-## 📜 License
-
-This project is licensed under the Apache License 2.0 - see the [LICENSE](LICENSE) file for details.
 
 ## 🔮 Future Improvements
 
