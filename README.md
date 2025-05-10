@@ -1,8 +1,5 @@
 # AI-Powered Infrastructure as Code (IaC) Generator
 
-<div align="center">
-  <img src="static/images/logo.png" alt="IaC Generator Logo" width="200">
-  <br><br>
   
   ![Python](https://img.shields.io/badge/Python-3.11-blue)
   ![FastAPI](https://img.shields.io/badge/FastAPI-0.108.0-green)
@@ -21,6 +18,12 @@
 - 🛡️ **Best Practices**: Follows infrastructure as code and security best practices
 - 🚀 **REST API**: Use the generator programmatically via API endpoints
 - 🔄 **Docker Support**: Easy deployment with Docker and docker-compose
+
+
+## Architecture
+
+![Ai-IaCgenerator](https://github.com/user-attachments/assets/e1e5a59f-10a8-4be9-9ee1-a94b320fc0b5)
+
 
 ## 📋 Prerequisites
 
